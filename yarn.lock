@@ -6842,7 +6842,7 @@ last-call-webpack-plugin@^3.0.0:
     lodash "^4.17.5"
     webpack-sources "^1.1.0"
 
-less-loader@5:
+less-loader@^5.0.0:
   version "5.0.0"
   resolved "https://registry.yarnpkg.com/less-loader/-/less-loader-5.0.0.tgz#498dde3a6c6c4f887458ee9ed3f086a12ad1b466"
   integrity sha512-bquCU89mO/yWLaUq0Clk7qCsKhsF/TZpJUzETRvJa9KSVEL9SO3ovCvdEHISBhrC81OwC8QSVX7E0bzElZj9cg==
@@ -6851,7 +6851,7 @@ less-loader@5:
     loader-utils "^1.1.0"
     pify "^4.0.1"
 
-less@3:
+less@^3.9.0:
   version "3.13.1"
   resolved "https://registry.yarnpkg.com/less/-/less-3.13.1.tgz#0ebc91d2a0e9c0c6735b83d496b0ab0583077909"
   integrity sha512-SwA1aQXGUvp+P5XdZslUOhhLnClSLIjWvJhmd+Vgib5BFIr9lMNlQwmwUNOjXThF/A0x+MCYYPeWEfeWiLRnTw==

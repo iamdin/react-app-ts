@@ -8,4 +8,3 @@ const Hello = (props: Props) => {
 };
 
 export default Hello;
-``
