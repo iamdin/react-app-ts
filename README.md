@@ -1,46 +1,169 @@
-# Getting Started with Create React App
+# Create-React-App TypeScript 项目初始化配置
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+使用 create-react-app 初始化 react 项目，并进行常用配置；
 
-## Available Scripts
+- typescript
+- less
+- css module
 
-In the project directory, you can run:
+## create-react-app 创建 TS 项目
 
-### `yarn start`
+```bash
+$ npx create-react-app my-app --template typescript
+```
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+## 导出 webpack 配置
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+```bash
+$ npm run eject
+$ # or
+$ yarn eject
 
-### `yarn test`
+```
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+## 安装依赖
 
-### `yarn build`
+```bash
+$ npm install less@^3.9.0 less-loader@^5.0.0 -S
+$ # or
+$ yarn add less@^3.9.0 less-loader@^5.0.0 -S
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+```
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+## 配置 less-loader，支持 CSS Module
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+```jsx
+// `config/webpack.config.js`
+const lessRegex = /\\.less$/;
+const lessModuleRegex = /\\.module\\.less$/;
 
-### `yarn eject`
+// It is focused on developer experience, fast rebuilds, and a minimal bundle.
+module.exports = function (webpackEnv) {
+  const isEnvDevelopment = webpackEnv === 'development';
+  const isEnvProduction = webpackEnv === 'production';
+  // ...
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+  module: {
+      // ...
+      rules: [
+          // ...
+          {
+              oneOf: [
+                  // ...
+                  {
+                      test: lessRegex,
+                      exclude: lessModuleRegex,
+                      use: getStyleLoaders(
+                        {
+                          importLoaders: 2,
+                          sourceMap: isEnvProduction && shouldUseSourceMap,
+                          modules: {
+                            getLocalIdent: getCSSModuleLocalIdent,
+                          },
+                        },
+                        'less-loader'
+                      ),
+                      sideEffects: true,
+                    },
+                    {
+                      test: lessModuleRegex,
+                      exclude: lessModuleRegex,
+                      use: getStyleLoaders(
+                        {
+                          importLoaders: 2,
+                          sourceMap: isEnvProduction && shouldUseSourceMap,
+                          modules: {
+                            getLocalIdent: getCSSModuleLocalIdent,
+                          },
+                        },
+                        'less-loader'
+                      ),
+                    },
+              ]
+          }
+      ]
+  }
+}
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+```
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+> 这里直接配置 .less 文件支持 css module，而不需要每次都使用 .module.less 为后缀名的文件
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+在组件内使用方式：
 
-## Learn More
+```less
+// index.less
+.text {
+    font-size: 50px;
+    color: red;
+}
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+```
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+```tsx
+// inidex.tsx
+import React from 'react';
+import styles from './index.less';
+
+interface Props {}
+
+const Hello = (props: Props) => {
+  return <div className={styles.text}>Hello</div>;
+};
+
+export default Hello;
+
+```
+
+## 配置 TypeScript 支持 CSS Module
+
+在 tsx 文件中，引入 .less 文件会报错找不到 module，需要在声明模块，并在 tsconfig.json 中配置
+
+新建文件 `typings/index.d.ts`
+
+```tsx
+// typings/index.d.ts
+declare module '*.css'
+declare module '*.less'
+declare module '*.scss'
+declare module '*.svg'
+
+```
+
+在 `tsconfig.json` 新增配置
+
+```json
+{
+    // ...
+    "include": ["src", "typings"],
+    "typings": "typings/*"
+}
+
+```
+
+## 路径别名
+
+在 `config/webpack.config.js` 中配置 alias
+
+```jsx
+// ...
+alias: {
+    '@': 'src',
+}
+
+```
+
+配置 ts 支持
+
+```json
+// tsconfig.json
+{
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./src/*"]
+    },
+  },
+}
+
+```
